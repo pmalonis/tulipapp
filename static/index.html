@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chat with TulipAI</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f7f6;
+            font-family: 'Arial', sans-serif;
+        }
+
+        #chatContainer {
+            display: flex;
+            flex-direction: column;
+            width: 500px;
+            height: 400px;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px 0 rgba(0, 0, 0, 0.2);
+            background-color: #fff;
+        }
+
+        #chatBox {
+            flex-grow: 1;
+            padding: 20px;
+            overflow: auto;
+            border-bottom: 1px solid #ddd;
+        }
+
+        #inputContainer {
+            display: flex;
+            border-top: 1px solid #ddd;
+        }
+
+        #inputBox {
+            flex-grow: 1;
+            border: none;
+            padding: 10px;
+            font-size: 16px;
+        }
+
+        #sendButton {
+            border: none;
+            background-color: #009688;
+            color: #fff;
+            padding: 10px 20px;
+            cursor: pointer;
+        }
+
+        #sendButton:hover {
+            background-color: #007965;
+        }
+                /* Style the chat box's scroll bar */
+                #chat-box::-webkit-scrollbar {
+            width: 8px;
+        }
+
+            /* Enable scrolling */
+        overflow: auto;
+
+        /* Hide scrollbar for Chrome, Safari and Opera */
+        
+        ::-webkit-scrollbar {
+            display: none;
+        }
+
+        /* Hide scrollbar for IE, Edge and Firefox */
+        -ms-overflow-style: none;  /* IE and Edge */
+        scrollbar-width: none;  /* Firefox */
+
+
+        #chat-box {
+            position: relative; /* Added to position copy button */
+        }
+
+        /* Style the copy button */
+        .copy-icon {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 20px;
+            color: #007BFF;
+            cursor: pointer;
+        }
+
+        .copy-icon:hover {
+            color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div id="chatContainer">
+        <div id="chatBox">
+            <i id="copy-button" class="fas fa-copy copy-icon"></i> <!-- Copy button with copy icon -->
+        </div>
+        <div id="inputContainer">
+            <input id="inputBox" name="prompt" type="text" placeholder="Type your message here...">
+            <button id="sendButton">Send</button>
+        </div>
+    </div>
+    
+    <script>
+        var inputBox = document.getElementById('inputBox');
+        var chatBox = document.getElementById('chatBox');
+        var sendButton = document.getElementById('sendButton');
+        const copyButton = document.getElementById('copy-button');
+
+        sendButton.onclick = async function(){
+            var text = inputBox.value;
+            var message = document.createElement('p');
+            message.textContent = 'User: ' + text;
+            chatBox.appendChild(message);
+
+            // Send the message to the server
+            const response = await fetch('http://tulipapp2-dev.us-east-1.elasticbeanstalk.com/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({message: text})
+            });
+
+            const data = await response.json();
+            var serverMessage = document.createElement('p');
+            serverMessage.textContent = 'TulipAI: ';
+            chatBox.appendChild(serverMessage);
+
+            // Create a typing effect
+            var i = 0;
+            var txt = data.reply;
+            var speed = 10; // Speed/duration of typing effect in milliseconds
+
+            function typeWriter() {
+                if (i < txt.length) {
+                    serverMessage.textContent += txt.charAt(i);
+                    i++;
+                    setTimeout(typeWriter, speed);
+                }
+            }
+
+            typeWriter();
+            
+            inputBox.value = "";
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        inputBox.addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            sendButton.click();
+        }
+        });
+        copyButton.onclick = function() {
+            // Create a temporary textarea to copy text from
+            const textarea = document.createElement('textarea');
+            textarea.textContent = chatBox.textContent;
+            document.body.appendChild(textarea);
+
+            // Select the text and copy it
+            textarea.select();
+            document.execCommand('copy');
+
+            // Remove the temporary textarea
+            document.body.removeChild(textarea);
+        };
+        // sendButton.onclick = async function(){
+        //     var text = inputBox.value;
+        //     var message = document.createElement('p');
+        //     message.textContent = 'User: ' + text;
+        //     chatBox.appendChild(message);
+
+        //     // Send the message to the server
+        //     const response = await fetch('http://localhost:5000/chat', {
+        //         method: 'POST',
+        //         headers: {
+        //             'Content-Type': 'application/json'
+        //         },
+        //         body: JSON.stringify({message: text})
+        //     });
+
+        //     const data = await response.json();
+
+        //     var serverMessage = document.createElement('p');
+        //     serverMessage.textContent = 'TulipAI: ' + data.reply;
+        //     chatBox.appendChild(serverMessage);
+            
+        //     // Create a typing effect
+        //     var i = 0;
+        //     var txt = data.reply;
+        //     var speed = 50; // Speed/duration of typing effect in milliseconds
+
+        //     function typeWriter() {
+        //         if (i < txt.length) {
+        //             serverMessage.textContent += txt.charAt(i);
+        //             i++;
+        //             setTimeout(typeWriter, speed);
+        //         }
+        //     }
+
+        // typeWriter();
+
+        //     inputBox.value = "";
+        //     chatBox.scrollTop = chatBox.scrollHeight;
+        // }
+
+    </script>
+</body>
+</html>
