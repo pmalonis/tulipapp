@@ -17,7 +17,7 @@ pd.options.plotting.backend = "plotly"
 app = Flask(__name__, static_folder='static')
 CORS(app)
 
-t5_outputs = pickle.load(open('all_t5_outputs_ten_year.p', 'rb')) 
+t5_outputs = pickle.load(open('all_t5_outputs.p', 'rb')) 
 countries = ['Germany', 'United Kingdom', 'United States']
 
 all_text_str = ''
