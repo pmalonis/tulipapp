@@ -46,6 +46,7 @@ def plot():
             xaxis_title='Date',
             yaxis_title='Temperature',
             legend_title='',
+            autosize=True,
             font=dict(
                 family="Open Sans, arial",
                 size=18,  # Set the font size here
