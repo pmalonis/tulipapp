@@ -111,6 +111,7 @@
 
         sendButton.onclick = async function(){
             var text = inputBox.value;
+            inputBox.value = "";
             var message = document.createElement('p');
             message.textContent = 'User: ' + text;
             chatBox.appendChild(message);
@@ -124,18 +125,17 @@
                 },
                 body: JSON.stringify({message: text})
             });
-
+            
             const data = await response.json();
             var serverMessage = document.createElement('p');
-            serverMessage.textContent = 'Data Articles:: ';
+            serverMessage.textContent = 'Data Articles: ';
             chatBox.appendChild(serverMessage);
 
             // Create a typing effect
-
+            //var txt = data.reply.replace(/\n/g, '<br>');
             var txt = data.reply;
             var speed = 10; // Speed/duration of typing effect in milliseconds
             var i = 0;
-
             function typeWriter() {
                 if (i < txt.length) {
                     serverMessage.textContent += txt.charAt(i);
@@ -144,7 +144,6 @@
                 }
             }
             typeWriter();
-            inputBox.value = "";
             chatBox.scrollTop = chatBox.scrollHeight;
         }
 

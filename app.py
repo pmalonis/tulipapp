@@ -40,8 +40,13 @@ def plot():
     for c in countries:
         country_df = df.loc[df['Country']==c]
         country_df['dt']=pd.to_datetime(country_df['dt'])
+        if c == 'United States':
+            min_year = 1825
+        else:
+            min_year = 1600
+            
         rolling_df = (country_df[(country_df['dt'].dt.month<=12) 
-                                & (country_df['dt'].dt.year>=1825) 
+                                & (country_df['dt'].dt.year>=min_year) 
                                 & (country_df['dt'].dt.year<=2012)]
         .groupby(country_df['dt'].dt.year)[['AverageTemperature']].mean()
         .rolling(10).mean()
@@ -97,7 +102,7 @@ def chat():
     
     response=chat_connect(messages)
     print(response)
-    
+
     return jsonify(reply=response.content)
 
 if __name__ == '__main__':
