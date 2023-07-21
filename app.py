@@ -19,7 +19,6 @@ def plot():
     df = pd.read_csv('TCube/Data/GlobalTemperature/GlobalLandTemperaturesByCountry.csv')
     #countries = ['United States', 'United Kingdom', 'France', 'Spain', 'Italy', 'Germany', 'Russia']
     countries = ['United States', 'United Kingdom', 'Germany']
-    countries = ['France']
     fig = go.Figure()
     for c in countries:
         country_df = df.loc[df['Country']==c]
