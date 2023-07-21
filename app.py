@@ -70,7 +70,7 @@ def plot():
             yaxis_title='Temperature',
             legend_title='',
             autosize=True,
-            height=350,
+            height=400,
             font=dict(
                 family="Open Sans, arial",
                 size=14,  # Set the font size here
