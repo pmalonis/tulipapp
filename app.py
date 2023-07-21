@@ -45,7 +45,7 @@ def plot():
         fig.update_layout(
             xaxis_title='Date',
             yaxis_title='Temperature',
-            legend_title='Country',
+            legend_title='',
             legend=dict(
                 y=0.5,
                 traceorder='reversed',
