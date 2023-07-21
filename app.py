@@ -5,10 +5,28 @@ import plotly
 import plotly.express as px
 import pandas as pd
 import plotly.graph_objects as go
+import pickle
+from langchain.schema import (
+    AIMessage,
+    HumanMessage,
+    SystemMessage
+)
+from langchain.chat_models import ChatOpenAI
 pd.options.plotting.backend = "plotly"
 
 app = Flask(__name__, static_folder='static')
 CORS(app)
+
+t5_outputs = pickle.load(open('all_t5_outputs.p', 'wb')) 
+countries = ['Germany', 'United Kingdom', 'United States']
+
+all_text_list = []
+for c in countries:
+    all_text_list += t5_outputs[c]
+
+all_text_str = '. '.join(all_text_list)
+context = SystemMessage(content=all_text_str)
+chat = ChatOpenAI(model_name="gpt-3.5-turbo",temperature=0.3)
 
 @app.route('/')
 def index():
@@ -47,7 +65,7 @@ def plot():
             yaxis_title='Temperature',
             legend_title='',
             autosize=True,
-            height=400,
+            height=450,
             font=dict(
                 family="Open Sans, arial",
                 size=14,  # Set the font size here
@@ -72,13 +90,14 @@ def plot():
 def chat():
     data = request.get_json()
     message = data.get('message')
-
-    # TODO: Handle the message and generate a response.
-    # This could involve calling a function that generates a response based on the message.
-    # For now, we'll just echo the user's message back to them.
-
-    response = 'You said: ' + message
-    return jsonify(reply=response)
+    
+    messages = [
+                context,
+                HumanMessage(content=message)
+            ]
+    response=chat(messages)
+    
+    return jsonify(reply=response.content)
 
 if __name__ == '__main__':
     app.run(debug=False, host='0.0.0.0')
