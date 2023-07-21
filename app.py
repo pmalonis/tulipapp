@@ -67,7 +67,7 @@ def plot():
 
         fig.update_layout(
             xaxis_title='Date',
-            yaxis_title='"Temperature (\u00B0C)',
+            yaxis_title='Average Land Temperature (\u00B0C)',
             legend_title='',
             autosize=True,
             height=450,
