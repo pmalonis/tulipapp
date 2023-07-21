@@ -46,11 +46,16 @@ def plot():
             xaxis_title='Date',
             yaxis_title='Temperature',
             legend_title='',
+            font=dict(
+                family="Open Sans, arial",
+                size=18,  # Set the font size here
+                color='darkslategray',
+                ),
             legend=dict(
                 y=0.5,
                 traceorder='reversed',
                 font=dict(
-                    size=16
+                    size=18
                 )
             ),
             template='simple_white'
