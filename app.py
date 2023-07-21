@@ -17,16 +17,15 @@ pd.options.plotting.backend = "plotly"
 app = Flask(__name__, static_folder='static')
 CORS(app)
 
-t5_outputs = pickle.load(open('all_t5_outputs.p', 'wb')) 
+t5_outputs = pickle.load(open('all_t5_outputs.p', 'rb')) 
 countries = ['Germany', 'United Kingdom', 'United States']
 
-all_text_list = []
+all_text_str = ''
 for c in countries:
-    all_text_list += t5_outputs[c]
+    all_text_str += '\n ' + t5_outputs[c]
 
-all_text_str = '. '.join(all_text_list)
 context = SystemMessage(content=all_text_str)
-chat = ChatOpenAI(model_name="gpt-3.5-turbo",temperature=0.3)
+chat_connect = ChatOpenAI(model_name="gpt-3.5-turbo",temperature=0.3)
 
 @app.route('/')
 def index():
@@ -90,14 +89,16 @@ def plot():
 def chat():
     data = request.get_json()
     message = data.get('message')
-    
+    print(message)
     messages = [
                 context,
                 HumanMessage(content=message)
             ]
-    response=chat(messages)
+    
+    response=chat_connect(messages)
+    print(response)
     
     return jsonify(reply=response.content)
 
 if __name__ == '__main__':
-    app.run(debug=False, host='0.0.0.0')
+    app.run(debug=True, host='0.0.0.0')

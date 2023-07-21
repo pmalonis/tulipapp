@@ -95,7 +95,7 @@
 <body>
     <div id="chatContainer">
         <div id="chatBox">
-            <i id="copy-button" class="fas fa-copy copy-icon"></i> <!-- Copy button with copy icon -->
+           <i id="copy-button" class="fas fa-copy copy-icon"></i> <!-- Copy button with copy icon -->
         </div>
         <div id="inputContainer">
             <input id="inputBox" name="prompt" type="text" placeholder="Type your message here...">
@@ -116,8 +116,8 @@
             chatBox.appendChild(message);
 
             // Send the message to the server
-            const response = await fetch('https://tulipapp3.dataarticles.com/chat', {
-            //const response = await fetch('http://127.0.0.1:5000/chat', {
+            //const response = await fetch('https://tulipapp3.dataarticles.com/chat', {
+            const response = await fetch('http://127.0.0.1:5000/chat', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -127,13 +127,14 @@
 
             const data = await response.json();
             var serverMessage = document.createElement('p');
-            serverMessage.textContent = 'TulipAI: ';
+            serverMessage.textContent = 'Data Articles:: ';
             chatBox.appendChild(serverMessage);
 
             // Create a typing effect
-            var i = 0;
+
             var txt = data.reply;
             var speed = 10; // Speed/duration of typing effect in milliseconds
+            var i = 0;
 
             function typeWriter() {
                 if (i < txt.length) {
@@ -142,9 +143,7 @@
                     setTimeout(typeWriter, speed);
                 }
             }
-
             typeWriter();
-            
             inputBox.value = "";
             chatBox.scrollTop = chatBox.scrollHeight;
         }
