@@ -4,6 +4,8 @@ import json
 import plotly
 import plotly.express as px
 import pandas as pd
+import plotly.graph_objects as go
+pd.options.plotting.backend = "plotly"
 
 app = Flask(__name__, static_folder='static')
 CORS(app)
@@ -14,23 +16,46 @@ def index():
 
 @app.route('/plot')
 def plot():
-   
-   # Students data available in a list of list
-    students = [['Akash', 34, 'Sydney', 'Australia'],
-                ['Rithika', 30, 'Coimbatore', 'India'],
-                ['Priya', 31, 'Coimbatore', 'India'],
-                ['Sandy', 32, 'Tokyo', 'Japan'],
-                ['Praneeth', 16, 'New York', 'US'],
-                ['Praveen', 17, 'Toronto', 'Canada']]
-     
-    # Convert list to dataframe and assign column values
-    df = pd.DataFrame(students,
-                      columns=['Name', 'Age', 'City', 'Country'],
-                      index=['a', 'b', 'c', 'd', 'e', 'f'])
-     
-    # Create Bar chart
-    fig = px.bar(df, x='Name', y='Age', color='City', barmode='group')
-     
+    df = pd.read_csv('TCube/Data/GlobalTemperature/GlobalLandTemperaturesByCountry.csv')
+    #countries = ['United States', 'United Kingdom', 'France', 'Spain', 'Italy', 'Germany', 'Russia']
+    countries = ['United States', 'United Kingdom', 'Germany']
+    countries = ['France']
+    fig = go.Figure()
+    for c in countries:
+        country_df = df.loc[df['Country']==c]
+        country_df['dt']=pd.to_datetime(country_df['dt'])
+        rolling_df = (country_df[(country_df['dt'].dt.month<=12) 
+                                & (country_df['dt'].dt.year>=1825) 
+                                & (country_df['dt'].dt.year<=2012)]
+        .groupby(country_df['dt'].dt.year)[['AverageTemperature']].mean()
+        .rolling(10).mean()
+        .dropna()
+        .reset_index()
+        .rename(columns={'dt':'Year', 
+                        'AverageTemperature': 'TenYearAverageTemperature'}))
+        fig.add_trace(
+            go.Scatter(
+                    x=rolling_df['Year'],
+                    y=rolling_df['TenYearAverageTemperature'],
+                    mode='lines',
+                    name=c,
+                    # Legend will use this name
+            )
+        )
+
+        fig.update_layout(
+            xaxis_title='Date',
+            yaxis_title='Temperature',
+            legend_title='Country',
+            legend=dict(
+                y=0.5,
+                traceorder='reversed',
+                font=dict(
+                    size=16
+                )
+            ),
+            template='simple_white'
+        )
     # Create graphJSON
     graphJSON = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
      
