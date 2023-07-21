@@ -1,5 +1,6 @@
 Flask
 Flask-Cors
+urllib3==1.26.6
 pandas
 plotly
 gunicorn
