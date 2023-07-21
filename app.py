@@ -47,10 +47,10 @@ def plot():
             yaxis_title='Temperature',
             legend_title='',
             autosize=True,
-            height=400
+            height=400,
             font=dict(
                 family="Open Sans, arial",
-                size=12,  # Set the font size here
+                size=14,  # Set the font size here
                 color='darkslategray',
                 ),
             legend=dict(
