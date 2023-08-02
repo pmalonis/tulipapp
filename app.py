@@ -25,8 +25,8 @@ for c in countries:
     all_text_str += '\n ' + t5_outputs[c]
 
 context = SystemMessage(content=all_text_str)
-chat_connect = ChatOpenAI(model_name="gpt-3.5-turbo",
-                          temperature=0.3, openai_api_key='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')
+chat_connect = ChatOpenAI(model_name="gpt-4",
+                          temperature=0.3, openai_api_key='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')
 
 @app.route('/')
 def index():
