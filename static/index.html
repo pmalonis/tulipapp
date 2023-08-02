@@ -117,7 +117,7 @@
             chatBox.appendChild(message);
 
             // Send the message to the server
-            const response = await fetch('tulipapp3-dev.us-east-1.elasticbeanstalk.com', {
+            const response = await fetch('tulipapp3-dev.us-east-1.elasticbeanstalk.com/chat', {
             //const response = await fetch('http://127.0.0.1:5000/chat', {
                 method: 'POST',
                 headers: {
