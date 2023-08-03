@@ -17,11 +17,11 @@ pd.options.plotting.backend = "plotly"
 app = Flask(__name__, static_folder='static')
 CORS(app)
 
-t5_outputs = pickle.load(open('all_t5_outputs.p', 'rb')) 
-countries = ['Germany', 'United Kingdom', 'United States']
+t5_outputs = pickle.load(open('all_t5_outputs_anomoly.p', 'rb')) 
+regions = ['Hawaiian Region', 'Asia', 'Europe', 'Africa']
 
 all_text_str = ''
-for c in countries:
+for c in regions:
     all_text_str += '\n ' + t5_outputs[c]
 
 context = SystemMessage(content=all_text_str)
@@ -34,31 +34,29 @@ def index():
 
 @app.route('/plot')
 def plot():
-    df = pd.read_csv('TCube/Data/GlobalTemperature/GlobalLandTemperaturesByCountry.csv')
-    #countries = ['United States', 'United Kingdom', 'France', 'Spain', 'Italy', 'Germany', 'Russia']
-    countries = ['United States', 'United Kingdom', 'Germany']
+    df = pd.read_csv('TCube/Data/GlobalTemperature/anomalies_our_world_in_data.csv')
     fig = go.Figure()
-    for c in countries:
-        country_df = df.loc[df['Country']==c]
+    for c in regions:
+        country_df = df.loc[df['Region']==c]
         country_df['dt']=pd.to_datetime(country_df['dt'])
-        if c == 'United States':
-            min_year = 1825
-        else:
-            min_year = 1600
+        # if c == 'United States':
+        #     min_year = 1825
+        # else:
+        #     min_year = 1600
 
-        rolling_df = (country_df[(country_df['dt'].dt.month<=12) 
-                                & (country_df['dt'].dt.year>=min_year) 
-                                & (country_df['dt'].dt.year<=2012)]
-        .groupby(country_df['dt'].dt.year)[['AverageTemperature']].mean()
-        .rolling(10).mean()
-        .dropna()
-        .reset_index()
-        .rename(columns={'dt':'Year', 
-                        'AverageTemperature': 'TenYearAverageTemperature'}))
+        # rolling_df = (country_df[(country_df['dt'].dt.month<=12) 
+        #                         & (country_df['dt'].dt.year>=min_year) 
+        #                         & (country_df['dt'].dt.year<=2012)]
+        # .groupby(country_df['dt'].dt.year)[['AverageTemperature']].mean()
+        # .rolling(10).mean()
+        # .dropna()
+        # .reset_index()
+        # .rename(columns={'dt':'Year', 
+        #                 'AverageTemperature': 'TenYearAverageTemperature'}))
         fig.add_trace(
             go.Scatter(
-                    x=rolling_df['Year'],
-                    y=rolling_df['TenYearAverageTemperature'],
+                    x=df['Year'],
+                    y=df['Anomaly'],
                     mode='lines',
                     name=c,
                     # Legend will use this name
@@ -67,7 +65,7 @@ def plot():
 
         fig.update_layout(
             xaxis_title='Date',
-            yaxis_title='Average Land Temperature (\u00B0C)',
+            yaxis_title='Temperature Anomaly (\u00B0C)',
             legend_title='',
             autosize=True,
             height=450,
