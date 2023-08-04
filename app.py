@@ -17,8 +17,8 @@ pd.options.plotting.backend = "plotly"
 app = Flask(__name__, static_folder='static')
 CORS(app)
 
-t5_outputs = pickle.load(open('all_t5_outputs_anomoly.p', 'rb')) 
-regions = ['Hawaiian Region', 'Asia', 'Europe', 'Africa']
+t5_outputs = pickle.load(open('all_t5_outputs_anomaly.p', 'rb')) 
+regions = ['Asia', 'Europe', 'Africa', 'Hawaiian Region', 'North America']
 
 all_text_str = ''
 for c in regions:
@@ -55,8 +55,8 @@ def plot():
         #                 'AverageTemperature': 'TenYearAverageTemperature'}))
         fig.add_trace(
             go.Scatter(
-                    x=df['Year'],
-                    y=df['Anomaly'],
+                    x=country_df['Year'],
+                    y=country_df['Anomaly'],
                     mode='lines',
                     name=c,
                     # Legend will use this name
