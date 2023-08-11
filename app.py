@@ -133,7 +133,7 @@ def chat():
         json_body = {
         "inputs": [
         [
-            {"role": "system", "content": "You are DataArticles. You generate texts to help journalists write stories about data. The data you are writing about today is {dataset_name}. Here is information about the data: {context}"},
+            {"role": "system", "content": f"You are DataArticles. You generate texts to help journalists write stories about data. The data you are writing about today is {dataset_name}. Here is information about the data: {context}"},
             {"role": "user", "content": ""}, # have to call user before assistant for api to work
             {"role": "assistant", "content": context},
             {"role": "user", "content": message}
