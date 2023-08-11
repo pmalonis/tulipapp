@@ -6,6 +6,7 @@ import plotly.express as px
 import pandas as pd
 import plotly.graph_objects as go
 import pickle
+import requests
 from langchain.schema import (
     AIMessage,
     HumanMessage,
@@ -14,19 +15,27 @@ from langchain.schema import (
 from langchain.chat_models import ChatOpenAI
 pd.options.plotting.backend = "plotly"
 
+engine = 'Llama'
+
 app = Flask(__name__, static_folder='static')
 CORS(app)
 
-t5_outputs = pickle.load(open('all_t5_outputs_anomaly.p', 'rb')) 
 regions = ['Asia', 'Europe', 'Africa', 'Hawaiian Region', 'North America']
+
+t5_outputs = pickle.load(open('all_t5_outputs_anomaly.p', 'rb')) 
 
 all_text_str = ''
 for c in regions:
     all_text_str += '\n ' + t5_outputs[c]
 
-context = SystemMessage(content=all_text_str)
-chat_connect = ChatOpenAI(model_name="gpt-4",
+if engine == 'ChatGPT':
+    context = SystemMessage(content=all_text_str)
+    chat_connect = ChatOpenAI(model_name="gpt-4",
                           temperature=0.3, openai_api_key='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')
+elif engine=='Llama':
+    context = all_text_str
+    api_url = 	'https://1wea2w43if.execute-api.us-east-1.amazonaws.com/default/call-llama'
+
 
 @app.route('/')
 def index():
@@ -89,20 +98,51 @@ def plot():
     # Use render_template to pass graphJSON to html
     return render_template('plot.html', graphJSON=graphJSON)
 
+#ChatGPT
+# @app.route('/chat', methods=['POST'])
+# def chat():
+#     data = request.get_json()
+#     message = data.get('message')
+#     print(message)
+#     messages = [
+#                 context,
+#                 HumanMessage(content=message)
+#             ]
+    
+#     response=chat_connect(messages)
+#     print(response)
+
+#     return jsonify(reply=response.content)
+
 @app.route('/chat', methods=['POST'])
 def chat():
     data = request.get_json()
     message = data.get('message')
-    print(message)
-    messages = [
+    print(context)
+    if engine == 'ChatGPT':
+        messages = [
                 context,
                 HumanMessage(content=message)
             ]
+        response = chat_connect(messages)
+        return jsonify(reply=response.content)
     
-    response=chat_connect(messages)
-    print(response)
+    elif engine == 'Llama':
+        json_body = {
+        "inputs": [
+        [
+            {"role": "system", "content": "You are DataArticles. You generate texts to help journalists write stories about data"},
+            {"role": "user", "content": ""}, # have to call user before assistant for api to work
+            {"role": "assistant", "content": context},
+            {"role": "user", "content": message}
+        ]
+        ],
+        "parameters": {"max_new_tokens":1024, "top_p":0.9, "temperature":0.6}
+        }
+        r = requests.post(api_url, json=json_body)
 
-    return jsonify(reply=response.content)
+        return jsonify(reply=r.json()[0]['generation']['content'])
+
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
